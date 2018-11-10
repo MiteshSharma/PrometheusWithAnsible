@@ -1,0 +1,66 @@
+- name: Creating blackbox_exporter user group
+  group: name="{{groupId}}"
+  become: true
+
+- name: Creating blackbox_exporter user
+  user:
+    name: "{{userId}}"
+    group: "{{groupId}}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "{{userId}} nologin User"
+    createhome: "no"
+    state: present
+
+- name: Install prometheus blackbox exporter
+  unarchive:
+    src: "https://github.com/prometheus/blackbox_exporter/releases/download/v{{ version }}/blackbox_exporter-{{ version }}.linux-amd64.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy prometheus blackbox exporter file to bin
+  copy:
+    src: "/tmp/blackbox_exporter-{{ version }}.linux-amd64/blackbox_exporter"
+    dest: "/usr/local/bin/blackbox_exporter"
+    owner: "{{userId}}"
+    group: "{{groupId}}"
+    remote_src: yes
+    mode: 0755
+
+- name: Delete blackbox exporter tmp folder
+  file:
+    path: '/tmp/blackbox_exporter-{{ version }}.linux-amd64'
+    state: absent
+
+- name: Creates directory
+  file: 
+    path: "/data/blackbox_exporter/"
+    state: directory
+    owner: "{{userId}}"
+    group: "{{groupId}}"
+    mode: 0755
+
+- name: Copy blackbox exporter config file
+  template:
+    src: blackbox.yml.j2
+    dest: /data/blackbox_exporter/blackbox.yml
+    owner: "{{userId}}"
+    group: "{{groupId}}"
+
+- name: Copy systemd init file
+  template:
+    src: init.service.j2
+    dest: /etc/systemd/system/blackbox_exporter.service
+  notify: event_restart_blackbox_exporter
+
+- name: Start blackbox_exporter service
+  service:
+    name: blackbox_exporter
+    state: started
+    enabled: yes
+
+- name: Check if blackbox_exporter is accessible
+  uri:
+    url: http://localhost:9115
+    method: GET
+    status_code: 200

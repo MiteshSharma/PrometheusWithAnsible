@@ -1,0 +1,5 @@
+- name: Restart the blackbox_exporter service
+  service:
+    name: blackbox_exporter
+    state: restarted
+  listen: event_restart_blackbox_exporter

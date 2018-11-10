@@ -8,7 +8,7 @@
     group: "{{groupId}}"
     system: yes
     shell: "/sbin/nologin"
-    comment: "prometheus nologin User"
+    comment: "{{userId}} nologin User"
     createhome: "no"
     state: present
 

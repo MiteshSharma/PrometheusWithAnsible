@@ -10,8 +10,23 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets:
-      {% for host in groups['node_exporter'] %}
+      {% for host in groups['all'] %}
       {% if inventory_hostname != host %}
         - '{{ host }}:9100'
       {% endif %}
       {% endfor %}
+  
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - http://www.google.com
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: localhost:9115

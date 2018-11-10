@@ -11,4 +11,5 @@
   become_user: root
   become_method: sudo
   roles:
+    - prometheus_blackbox_exporter
     - prometheus
