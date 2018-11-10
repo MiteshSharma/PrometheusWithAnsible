@@ -1,0 +1,14 @@
+---
+- hosts: node_exporter
+  become: yes
+  become_user: root
+  become_method: sudo
+  roles:
+    - prometheus_node_exporter
+
+- hosts: prometheus
+  become: yes
+  become_user: root
+  become_method: sudo
+  roles:
+    - prometheus
