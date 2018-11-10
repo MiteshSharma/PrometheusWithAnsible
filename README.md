@@ -1,6 +1,6 @@
 # Prometheus Setup using Ansible
 
-In this project, we are configurating prometheus on one instance and node_exporter on another instance using ansible.
+In this project, we are configurating prometheus with blackbox_exporter on one instance and node_exporter on another instance using ansible.
 
 ## Getting Started
 
